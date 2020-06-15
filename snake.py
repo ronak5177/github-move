@@ -37,6 +37,15 @@ while not exit_game:
             if event.key == pygame.K_RIGHT:
                 snake_x = snake_x + 10
 
+            if event.key == pygame.K_LEFT:
+                snake_x = snake_x - 10
+
+            if event.key == pygame.K_UP:
+                snake_y = snake_y - 10
+
+            if event.key == pygame.K_DOWN:
+                snake_y = snake_y + 10
+
     gameWindow.fill(white)
     pygame.draw.rect(gameWindow, black, [snake_x, snake_y, snake_size, snake_size])
     pygame.display.update()
