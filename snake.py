@@ -7,6 +7,7 @@ pygame.init()
 white = (255, 255, 255)
 red = (255, 0, 0)
 black = (0, 0, 0)
+gray = (203, 220, 210)
 
 screen_width = 900
 screen_height = 600
@@ -19,11 +20,28 @@ pygame.display.update()
 
 
 clock = pygame.time.Clock()
-font = pygame.font.SysFont(None, 35)
+font = pygame.font.SysFont(None, 40)
 
 def text_screen(text, color, x, y):
     screen_text = font.render(text, True, color)
     gameWindow.blit(screen_text, [x, y])
+
+def welcome():
+    exit_game = False
+    while not exit_game:
+        gameWindow.fill(gray)
+        text_screen("Snake Game by Ronak Patel", black, screen_width/4, screen_height/3)
+        text_screen("press space to play", black, screen_width/3, screen_height/3 + 40)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit_game = True
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    gameloop()
+
+        pygame.display.update()
+        clock.tick(40)
 
 def plot_snake(gameWindow, color, snake_list, snake_size):
     for x,y in snake_list:
@@ -45,6 +63,13 @@ def gameloop():
     snake_size = 20
     fps = 40
 
+    try:
+        with open('high_score.txt', 'r') as f:
+            highscore = f.read()
+    except Exception as e:
+        highscore = score
+        print("File not Found")
+
     snake_list = []
     snake_length = 1
     # Game Loop
@@ -53,6 +78,10 @@ def gameloop():
         # print("Game Over")
     while not exit_game:
         if game_over:
+
+            with open('high_score.txt', 'w') as f:
+                f.write(str(highscore))
+
             gameWindow.fill(white)
             text_screen("Game Over! Press Enter To Continue", red, screen_width/4, screen_height/3)
 
@@ -62,7 +91,7 @@ def gameloop():
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
-                        gameloop()
+                        welcome()
         else:
 
             for event in pygame.event.get():
@@ -86,17 +115,24 @@ def gameloop():
                         velocity_y = init_velocity
                         velocity_x = 0
 
+                    # Adding Cheat Code
+                    if event.key == pygame.K_q:
+                        score += 10
+
             snake_x += velocity_x
             snake_y += velocity_y
 
             if abs(snake_x - food_x) < 18 and abs(snake_y - food_y) < 18:
-                score += 1
+                score += 10
                 food_x = random.randint(50, screen_width / 2)
                 food_y = random.randint(50, screen_height / 2)
                 snake_length += 5
 
+                if score > int(highscore):
+                    highscore = score
+
             gameWindow.fill(white)
-            text_screen(f"Score : {score * 10}", red, 5, 5)
+            text_screen(f"Score : {score}  HighScore : {highscore}", red, 5, 5)
             pygame.draw.rect(gameWindow, red, [food_x, food_y, snake_size, snake_size])
 
             head = []
@@ -121,6 +157,7 @@ def gameloop():
     pygame.quit()
     quit()
 
-gameloop()
+welcome()
+
 
 
